@@ -1,17 +1,42 @@
 # College Event Planner
 
-<<<<<<< HEAD
-A college event manager with a **command-line app** and a **web page**, both using the same SQLite database (`event_planner.db`).
+A college event manager with a **web page** and a **command-line app**, both using the same SQLite database. Students can browse events, register, and rate the events they attended. Only registered students can leave a rating.
+
+![Home page in day mode](docs/screenshots/home-day.png)
 
 ## Features
 
 - Add events with date, venue, organizer(s), audience, category and seat capacity
 - Register students and track seats left automatically (no overbooking)
-- **Ratings & feedback (1-5 stars + comment) from registered students only**, one per student per event
-- Search by name, venue, organizer or category; filter by category
-- Dashboard: total registrations, most popular event, top-rated event
-- **Day / night mode** with a pink palette (remembers your choice, follows your device by default)
-- Home page with a hero banner and search, quick stats, category chips, and ticket-style event cards showing seats left
+- Ratings and feedback (1 to 5 stars plus a comment) from **registered students only**, one per student per event
+- Search by name, venue, organizer or category, and filter by category chips
+- Dashboard with total registrations, most popular event and top-rated event
+- Day and night mode in a pink palette (remembers your choice, follows your device by default)
+- Command-line version with the same features
+
+## Screenshots
+
+### Home page
+
+| Day | Night |
+|-----|-------|
+| ![Home, day](docs/screenshots/home-day.png) | ![Home, night](docs/screenshots/home-night.png) |
+
+A hero banner with search, quick stats, category filters and ticket-style event cards that show seats left.
+
+### Event page: register and rate
+
+| Day | Night |
+|-----|-------|
+| ![Event, day](docs/screenshots/event-day.png) | ![Event, night](docs/screenshots/event-night.png) |
+
+### Dashboard
+
+| Day | Night |
+|-----|-------|
+| ![Dashboard, day](docs/screenshots/dashboard-day.png) | ![Dashboard, night](docs/screenshots/dashboard-night.png) |
+
+The screenshots use sample data from `seed_data.py` plus a few demo registrations and ratings.
 
 ## Setup
 
@@ -24,40 +49,36 @@ pip install -r requirements.txt
 ```bash
 python app.py
 ```
-Open http://127.0.0.1:5000
 
-Optional sample data: `python seed_data.py`
+Open http://127.0.0.1:5000. Press Ctrl+C in the terminal to stop it.
+
+Optional sample events: `python seed_data.py`
 
 ## Run the command-line version
-=======
-A simple Python command-line mini-project for managing college events and student registrations.
-
-## Features
-
-- Add college events with date, venue, organizer, audience, category, and seat capacity.
-- Register students for an event.
-- Track seats left automatically.
-- Search events by name, venue, organizer, or category.
-- Show all events and a dashboard with total registrations.
-- Show the most popular event based on registration count.
-
-## Run
->>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
 
 ```bash
 python event_planner.py
 ```
 
-<<<<<<< HEAD
 ## How "registered students only" works
 
-To rate an event, a student enters their **roll number and the phone number they registered with**.
-The app checks that this pair is registered for *that* event, and allows one rating per registration.
-(This is a simple check suited to a mini-project, not full login security.)
+To rate an event, a student enters their **roll number and the phone number they registered with**. The app checks that this pair is registered for that event, and allows one rating per registration.
 
-## Database tables
+This is a simple check suited to a mini-project, not full login security.
 
-`events`, `organizers`, `event_organizers`, `students`, `registrations`, `feedback`
+## Project structure
+
+```
+app.py               Flask web app (routes)
+event_planner.py     Database logic and command-line app
+seed_data.py         Optional sample events
+templates/           HTML pages (Jinja)
+static/              style.css and theme.js (day/night toggle)
+docs/screenshots/    Images used in this README
+event_planner.db     SQLite database (created automatically, not in git)
+```
+
+Database tables: `events`, `organizers`, `event_organizers`, `students`, `registrations`, `feedback`
 
 ## Colour palette
 
@@ -65,31 +86,7 @@ The app checks that this pair is registered for *that* event, and allows one rat
 |-------|---------|
 | Day   | Bubblegum Pink `#ff758f`, Cotton Candy `#ff8fa3`, Cherry Blossom `#ffb3c1`, Pastel Petal `#ffccd5` |
 | Night | Night Bordeaux `#590d22`, Dark Amaranth `#800f2f`, Cherry Rose `#a4133c` |
-=======
-## Screenshots
 
-The CLI supports event creation, student registration, event search, dashboard summaries, and registration tracking.
+## Privacy note
 
-### Add Events and Register Students
-
-![Add an event and register a student](docs/screenshots/menu-and-event.png)
-
-### Browse and Search Events
-
-![Browse and search events](docs/screenshots/events-and-search.png)
-
-### Event Dashboard
-
-![Event dashboard](docs/screenshots/dashboard.png)
-
-### Registration Records
-
-![Registration records](docs/screenshots/registrations.png)
-
-## Project Data
-
-The project automatically stores data in:
-
-- `data/events.json`
-- `data/registrations.json`
->>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
+The database holds student names, roll numbers and phone numbers, so `event_planner.db` is listed in `.gitignore`. Don't commit it to a public repository.
