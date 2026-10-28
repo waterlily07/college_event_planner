@@ -1,4 +1,12 @@
 __pycache__/
+<<<<<<< HEAD
 *.pyc
 event_planner.db
 .venv/
+=======
+*.py[cod]
+.venv/
+venv/
+env/
+.env
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4

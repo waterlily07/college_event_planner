@@ -1,12 +1,35 @@
 #!/usr/bin/env python3
+<<<<<<< HEAD
 import os
 import sqlite3
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'event_planner.db')
+=======
+import json
+import os
+import sys
+
+DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+EVENTS_FILE = os.path.join(DATA_DIR, 'events.json')
+REGISTRATIONS_FILE = os.path.join(DATA_DIR, 'registrations.json')
+
+
+def ensure_data_files():
+    os.makedirs(DATA_DIR, exist_ok=True)
+
+    if not os.path.exists(EVENTS_FILE):
+        with open(EVENTS_FILE, 'w') as f:
+            json.dump([], f)
+
+    if not os.path.exists(REGISTRATIONS_FILE):
+        with open(REGISTRATIONS_FILE, 'w') as f:
+            json.dump([], f)
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
 
 
 class EventPlanner:
     def __init__(self):
+<<<<<<< HEAD
         self.init_db()
 
     def get_connection(self):
@@ -142,6 +165,33 @@ class EventPlanner:
                 (event_id,)
             ).fetchone()
         return {'total': row['total'], 'average': round(row['average'], 1) if row['average'] else None}
+=======
+        ensure_data_files()
+        self.events = self.load_events()
+        self.registrations = self.load_registrations()
+
+    def load_events(self):
+        try:
+            with open(EVENTS_FILE, 'r') as f:
+                return json.load(f)
+        except Exception:
+            return []
+
+    def load_registrations(self):
+        try:
+            with open(REGISTRATIONS_FILE, 'r') as f:
+                return json.load(f)
+        except Exception:
+            return []
+
+    def save_events(self):
+        with open(EVENTS_FILE, 'w') as f:
+            json.dump(self.events, f, indent=4)
+
+    def save_registrations(self):
+        with open(REGISTRATIONS_FILE, 'w') as f:
+            json.dump(self.registrations, f, indent=4)
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
 
     def display_menu(self):
         print('\n' + '=' * 60)
@@ -153,6 +203,7 @@ class EventPlanner:
         print('4. Search Events')
         print('5. Show Event Dashboard')
         print('6. Show Registrations')
+<<<<<<< HEAD
         print('7. Give Feedback / Rating')
         print('8. Show Feedback')
         print('9. Exit')
@@ -191,11 +242,17 @@ class EventPlanner:
             ).fetchall()
             return [row['name'] for row in rows]
 
+=======
+        print('7. Exit')
+        print('=' * 60)
+
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
     def add_event(self):
         print('\nADD NEW EVENT')
         event_name = input('Event Name: ').strip()
         event_date = input('Event Date (YYYY-MM-DD): ').strip()
         venue = input('Venue: ').strip()
+<<<<<<< HEAD
         organizer_input = input('Organizer Name(s) (comma separated): ').strip()
         audience = input('Audience (e.g. BCA Students): ').strip()
         category = input('Category (Technical/Cultural/Sports/Workshop): ').strip()
@@ -207,12 +264,19 @@ class EventPlanner:
         if total_seats <= 0:
             print('Total seats must be at least 1.')
             return
+=======
+        organizer = input('Organizer: ').strip()
+        audience = input('Audience (e.g. BCA Students): ').strip()
+        category = input('Category (Technical/Cultural/Sports/Workshop): ').strip()
+        total_seats = int(input('Total Seats: ').strip())
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
         description = input('Description: ').strip()
 
         if not event_name or not event_date:
             print('Event name and date are required.')
             return
 
+<<<<<<< HEAD
         with self.get_connection() as conn:
             event_id = self.generate_event_id(conn)
             conn.execute(
@@ -317,6 +381,26 @@ class EventPlanner:
             organizers = ', '.join(self.get_organizer_names_for_event(event_id)) or 'Not assigned'
             print(f"{event_id} | {event['event_name']} | {event['event_date']} | {event['venue']} | {event['category']} | Organizer(s): {organizers} | Seats Left: {seats_left}/{event['total_seats']}")
 
+=======
+        event_id = 'EV' + str(1000 + len(self.events) + 1)
+
+        event = {
+            'event_id': event_id,
+            'event_name': event_name,
+            'event_date': event_date,
+            'venue': venue,
+            'organizer': organizer,
+            'audience': audience,
+            'category': category,
+            'total_seats': total_seats,
+            'description': description
+        }
+
+        self.events.append(event)
+        self.save_events()
+        print(f'Event added successfully: {event_id}')
+
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
     def register_student(self):
         print('\nREGISTER STUDENT FOR EVENT')
         self.show_all_events_for_choice()
@@ -341,6 +425,7 @@ class EventPlanner:
             print('Student name and roll number are required.')
             return
 
+<<<<<<< HEAD
         with self.get_connection() as conn:
             student_row = conn.execute(
                 'SELECT student_id FROM students WHERE LOWER(roll_number) = LOWER(?)',
@@ -399,6 +484,100 @@ class EventPlanner:
         for row in rows:
             seats_left = int(row['total_seats']) - int(row['registration_count'])
             print(f"{row['event_id']} | {row['event_name']} | Registrations: {row['registration_count']} | Seats Left: {seats_left}")
+=======
+        registration_id = 'REG' + str(1000 + len(self.registrations) + 1)
+
+        registration = {
+            'registration_id': registration_id,
+            'event_id': event_id,
+            'student_name': student_name,
+            'roll_number': roll_number,
+            'department': department,
+            'phone': phone
+        }
+
+        self.registrations.append(registration)
+        self.save_registrations()
+        print(f'Registration successful: {registration_id}')
+
+    def get_event_by_id(self, event_id):
+        for event in self.events:
+            if event['event_id'].lower() == event_id.lower():
+                return event
+        return None
+
+    def get_seats_left(self, event_id):
+        event = self.get_event_by_id(event_id)
+        if not event:
+            return 0
+
+        total_seats = event['total_seats']
+        registered = 0
+
+        for reg in self.registrations:
+            if reg['event_id'].lower() == event_id.lower():
+                registered += 1
+
+        return total_seats - registered
+
+    def show_all_events_for_choice(self):
+        if not self.events:
+            print('No events exist yet.')
+            return
+
+        print('\nAvailable Events:')
+        for event in self.events:
+            seats_left = self.get_seats_left(event['event_id'])
+            print(f"{event['event_id']} | {event['event_name']} | {event['event_date']} | {event['venue']} | Seats Left: {seats_left}/{event['total_seats']}")
+
+    def show_all_events(self):
+        if not self.events:
+            print('No events found.')
+            return
+
+        print('\nALL EVENTS')
+        for event in self.events:
+            seats_left = self.get_seats_left(event['event_id'])
+            print(f"\n{event['event_id']} - {event['event_name']}")
+            print(f"Date: {event['event_date']} | Venue: {event['venue']} | Organizer: {event['organizer']}")
+            print(f"Category: {event['category']} | Audience: {event['audience']}")
+            print(f"Seats: {seats_left}/{event['total_seats']} left")
+            print(f"Description: {event['description']}")
+
+    def search_events(self):
+        keyword = input('Search events by name, venue, organizer, or category: ').strip().lower()
+        found = []
+
+        for event in self.events:
+            fields = f"{event['event_name']} {event['venue']} {event['organizer']} {event['category']}".lower()
+            if keyword in fields:
+                found.append(event)
+
+        if not found:
+            print('No matching events found.')
+            return
+
+        print('\nSEARCH RESULTS')
+        for event in found:
+            seats_left = self.get_seats_left(event['event_id'])
+            print(f"{event['event_id']} | {event['event_name']} | {event['event_date']} | {event['venue']} | {event['category']} | Seats Left: {seats_left}/{event['total_seats']}")
+
+    def show_dashboard(self):
+        print('\nEVENT DASHBOARD')
+
+        if not self.events:
+            print('No events available.')
+            return
+
+        for event in self.events:
+            reg_count = 0
+            for reg in self.registrations:
+                if reg['event_id'].lower() == event['event_id'].lower():
+                    reg_count += 1
+
+            seats_left = event['total_seats'] - reg_count
+            print(f"{event['event_id']} | {event['event_name']} | Registrations: {reg_count} | Seats Left: {seats_left}")
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
 
         popular = self.get_most_popular_event()
         if popular:
@@ -408,6 +587,7 @@ class EventPlanner:
             print('\nMost Popular Event: No registrations yet')
 
     def get_most_popular_event(self):
+<<<<<<< HEAD
         with self.get_connection() as conn:
             row = conn.execute(
                 '''
@@ -442,10 +622,29 @@ class EventPlanner:
             ).fetchall()
 
         if not rows:
+=======
+        if not self.events:
+            return None
+
+        results = []
+        for event in self.events:
+            reg_count = sum(1 for reg in self.registrations if reg['event_id'].lower() == event['event_id'].lower())
+            results.append({'event_name': event['event_name'], 'event_id': event['event_id'], 'registrations': reg_count})
+
+        if not results:
+            return None
+
+        results.sort(key=lambda item: item['registrations'], reverse=True)
+        return results[0]
+
+    def show_registrations(self):
+        if not self.registrations:
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
             print('\nNo registrations yet.')
             return
 
         print('\nALL REGISTRATIONS')
+<<<<<<< HEAD
         for row in rows:
             print(f"{row['registration_id']} | {row['event_name']} | {row['student_name']} | {row['roll_number']} | {row['department']} | {row['phone']}")
 
@@ -481,11 +680,21 @@ class EventPlanner:
         print('\nALL FEEDBACK')
         for row in rows:
             print(f"{row['event_id']} | {row['event_name']} | {row['student_name']} | {row['rating']}/5 | {row['comment'] or '-'}")
+=======
+        for reg in self.registrations:
+            event = self.get_event_by_id(reg['event_id'])
+            event_name = event['event_name'] if event else 'Unknown Event'
+            print(f"{reg['registration_id']} | {event_name} | {reg['student_name']} | {reg['roll_number']} | {reg['department']} | {reg['phone']}")
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
 
     def run(self):
         while True:
             self.display_menu()
+<<<<<<< HEAD
             choice = input('Choose an option (1-9): ').strip()
+=======
+            choice = input('Choose an option (1-7): ').strip()
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
 
             if choice == '1':
                 self.add_event()
@@ -500,6 +709,7 @@ class EventPlanner:
             elif choice == '6':
                 self.show_registrations()
             elif choice == '7':
+<<<<<<< HEAD
                 self.give_feedback()
             elif choice == '8':
                 self.show_feedback()
@@ -508,6 +718,12 @@ class EventPlanner:
                 break
             else:
                 print('Invalid option. Please choose from 1 to 9.')
+=======
+                print('Goodbye!')
+                break
+            else:
+                print('Invalid option. Please choose from 1 to 7.')
+>>>>>>> feffcf6a718c68e105a5b96ef23f469a584969d4
 
             input('\nPress Enter to continue...')
 
