@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% from '_stars.html' import stars %}
+{% block title %}{{ event.event_name }} · College Event Planner{% endblock %}
+{% block content %}
+<section class="banner">
+  <a href="{{ url_for('index') }}">← All events</a>
+  <div class="row" style="margin-top:.6rem">
+    <span class="tag">{{ event.category or 'General' }}</span>
+    {% if event.is_past %}<span class="tag alt">Past event</span>{% endif %}
+  </div>
+  <h1>{{ event.event_name }}</h1>
+  <p class="sub">{{ event.event_id }} · 📅 {{ event.event_date }} · 📍 {{ event.venue or 'TBA' }}</p>
+</section>
+
+<div class="detail">
+  <div>
+    <section class="card" style="margin-bottom:1.2rem">
+      <h2>About</h2>
+      <p>{{ event.description or 'No description provided.' }}</p>
+      <p class="meta">👥 Organizers: {{ event.organizers or 'College Team' }}<br>🎯 Audience: {{ event.audience or 'Everyone' }}</p>
+      <div class="bar"><span style="width: {{ (100 * event.registered / event.total_seats) | round | int }}%"></span></div>
+      <p class="meta">{{ [event.seats_left, 0] | max }} of {{ event.total_seats }} seats left</p>
+    </section>
+
+    <section class="card" id="reviews">
+      <h2>Student feedback</h2>
+      {% if event.rating.average %}
+        <p>{{ stars(event.rating.average) }} <b>{{ event.rating.average }}</b> / 5 <span class="meta">from {{ event.rating.total }} registered student{{ '' if event.rating.total == 1 else 's' }}</span></p>
+      {% endif %}
+      {% for r in reviews %}
+        <div class="review">
+          <div class="row"><b>{{ r.student_name }}</b> {{ stars(r.rating) }}<span class="spacer"></span><span class="meta">{{ r.created_at[:10] }}</span></div>
+          {% if r.comment %}<p style="margin:.3rem 0 0">{{ r.comment }}</p>{% endif %}
+        </div>
+      {% else %}
+        <p class="meta">No feedback yet. Registered students can be the first!</p>
+      {% endfor %}
+    </section>
+  </div>
+
+  <div>
+    <section class="card" id="register" style="margin-bottom:1.2rem">
+      <h2>Register</h2>
+      {% if event.seats_left <= 0 %}
+        <p>This event is full.</p>
+      {% else %}
+      <form class="stack" method="post" action="{{ url_for('register', event_id=event.event_id) }}">
+        <label>Full name <input name="student_name" required></label>
+        <div class="two">
+          <label>Roll number <input name="roll_number" required></label>
+          <label>Department <input name="department"></label>
+        </div>
+        <label>Phone <input name="phone" type="tel" required></label>
+        <button class="btn" type="submit">Register me</button>
+      </form>
+      {% endif %}
+    </section>
+
+    <section class="card" id="feedback">
+      <h2>Rate this event</h2>
+      <p class="meta">Only students registered for this event can leave a rating. Verify with your roll number and the phone number you registered with. One rating per student.</p>
+      <form class="stack" method="post" action="{{ url_for('feedback', event_id=event.event_id) }}">
+        <div class="two">
+          <label>Roll number <input name="roll_number" required></label>
+          <label>Phone <input name="phone" type="tel" required></label>
+        </div>
+        <fieldset class="star-picker" aria-label="Rating out of 5">
+          {% for i in [5,4,3,2,1] %}
+            <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" {{ 'required' if i == 5 }}>
+            <label for="star{{ i }}" title="{{ i }} star{{ '' if i == 1 else 's' }}">★</label>
+          {% endfor %}
+        </fieldset>
+        <label>Comment (optional) <textarea name="comment" rows="3" maxlength="500"></textarea></label>
+        <button class="btn" type="submit">Submit feedback</button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

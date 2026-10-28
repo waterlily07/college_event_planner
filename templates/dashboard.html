@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% from '_stars.html' import stars %}
+{% block title %}Dashboard · College Event Planner{% endblock %}
+{% block content %}
+<section class="banner">
+  <div class="eyebrow">Overview</div>
+  <h1>Dashboard</h1>
+  <p class="sub">A quick look at how your events are doing.</p>
+</section>
+
+<div class="stats">
+  <div class="tile"><span class="meta">Events</span><b>{{ events | length }}</b></div>
+  <div class="tile"><span class="meta">Total registrations</span><b>{{ total_regs }}</b></div>
+  <div class="tile"><span class="meta">Most popular</span>
+    <b style="font-size:1.15rem">{{ popular.event_name if popular else '—' }}</b>
+    {% if popular %}<span class="meta">{{ popular.registered }} registrations</span>{% endif %}</div>
+  <div class="tile"><span class="meta">Top rated</span>
+    <b style="font-size:1.15rem">{{ top_rated.event_name if top_rated else '—' }}</b>
+    {% if top_rated %}{{ stars(top_rated.rating.average) }} <span class="meta">{{ top_rated.rating.average }}</span>{% endif %}</div>
+</div>
+
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>ID</th><th>Event</th><th>Date</th><th>Registered</th><th>Seats left</th><th>Rating</th></tr></thead>
+    <tbody>
+    {% for e in events %}
+      <tr>
+        <td>{{ e.event_id }}</td>
+        <td><a href="{{ url_for('event_detail', event_id=e.event_id) }}">{{ e.event_name }}</a></td>
+        <td>{{ e.event_date }}</td>
+        <td>{{ e.registered }} / {{ e.total_seats }}</td>
+        <td>{{ [e.seats_left, 0] | max }}</td>
+        <td>{% if e.rating.average %}{{ stars(e.rating.average) }} {{ e.rating.average }} ({{ e.rating.total }}){% else %}—{% endif %}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6">No events yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

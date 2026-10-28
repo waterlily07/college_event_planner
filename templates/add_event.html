@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Add event · College Event Planner{% endblock %}
+{% block content %}
+<section class="banner">
+  <div class="eyebrow">Organizers</div>
+  <h1>Add a new event</h1>
+  <p class="sub">Separate multiple organizers with commas.</p>
+</section>
+<form class="card stack" method="post" style="max-width:640px">
+  <label>Event name <input name="event_name" value="{{ form.get('event_name','') }}" required></label>
+  <div class="two">
+    <label>Date <input type="date" name="event_date" value="{{ form.get('event_date','') }}" required></label>
+    <label>Total seats <input type="number" name="total_seats" min="1" value="{{ form.get('total_seats','') }}" required></label>
+  </div>
+  <div class="two">
+    <label>Venue <input name="venue" value="{{ form.get('venue','') }}"></label>
+    <label>Category
+      <select name="category">
+        {% for c in categories %}<option value="{{ c }}" {{ 'selected' if form.get('category') == c }}>{{ c }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+  <label>Organizer(s) <input name="organizers" value="{{ form.get('organizers','') }}" placeholder="Coding Club, Student Council"></label>
+  <label>Audience <input name="audience" value="{{ form.get('audience','') }}" placeholder="BCA Students"></label>
+  <label>Description <textarea name="description" rows="4">{{ form.get('description','') }}</textarea></label>
+  <button class="btn" type="submit">Create event</button>
+</form>
+{% endblock %}

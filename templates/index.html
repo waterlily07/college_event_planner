@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% from '_stars.html' import stars %}
+{% block content %}
+<section class="hero">
+  <div class="eyebrow">This semester</div>
+  <h1>Find your next<br>campus moment</h1>
+  <form method="get" class="hero-search" role="search">
+    <span aria-hidden="true">🔍</span>
+    <input type="search" name="q" value="{{ q }}" placeholder="Search events, venues, clubs" aria-label="Search events">
+    {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+    <button class="btn" type="submit">Search</button>
+  </form>
+</section>
+
+<div class="stats3">
+  <div class="tile"><span class="meta">Events</span><b>{{ stats.events }}</b></div>
+  <div class="tile"><span class="meta">Registered</span><b>{{ stats.regs }}</b></div>
+  <div class="tile"><span class="meta">Avg rating</span><b>{{ stats.avg if stats.avg else '—' }}</b></div>
+</div>
+
+<nav class="chips" aria-label="Filter by category">
+  <a class="chip {{ 'on' if not category }}" href="{{ url_for('index', q=q or None) }}">All</a>
+  {% for c in categories %}
+    <a class="chip {{ 'on' if c == category }}" href="{{ url_for('index', category=c, q=q or None) }}">{{ c }}</a>
+  {% endfor %}
+</nav>
+
+{% if events %}
+<div class="tickets">
+  {% for e in events %}
+  {% set full = e.seats_left <= 0 %}
+  <a class="ticket {{ 'sold' if full }} {{ 'past' if e.is_past and not full }}" href="{{ url_for('event_detail', event_id=e.event_id) }}">
+    <div class="ticket-main">
+      <div class="row"><span class="tag">{{ e.category or 'General' }}</span><span class="meta">{{ e.organizers or 'College Team' }}</span></div>
+      <h3>{{ e.event_name }}</h3>
+      <div class="meta">📅 {{ e.event_date }} · 📍 {{ e.venue or 'TBA' }}</div>
+      <div class="row">
+        {% if e.rating.average %}{{ stars(e.rating.average) }} <span class="meta">{{ e.rating.average }} ({{ e.rating.total }})</span>
+        {% else %}<span class="meta">No ratings yet</span>{% endif %}
+      </div>
+    </div>
+    <div class="ticket-stub">
+      <span class="notch t"></span><span class="notch b"></span>
+      {% if full %}
+        <span class="stub-num">Full</span><span class="stub-lbl">sold out</span>
+      {% else %}
+        <span class="stub-num">{{ e.seats_left }}</span><span class="stub-lbl">seats left</span>
+        <span class="stub-cta">{{ 'Rate' if e.is_past else '🎟 Book' }}</span>
+      {% endif %}
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card"><p>No events found. <a href="{{ url_for('add_event') }}">Add the first one!</a></p></div>
+{% endif %}
+{% endblock %}
